@@ -1,0 +1,75 @@
+###
+# @name session
+@email=exampleuser
+@password=NewPassword!123
+POST {{host}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "emailOrUsername": "{{email}}",
+  "password": "{{password}}",
+  "responseType": "json"
+}
+
+
+###
+# Create a new user
+# @ref session
+POST {{host}}/users HTTP/1.1
+Cookie: accessToken={{session.data.accessToken}}
+Content-Type: application/json
+
+
+{
+    "username": "exampleuser",
+    "email": "example@example.com",
+    "password": "Password!123"
+}
+
+###
+# Get users
+# @ref session
+@page=1
+@limit=3
+@search=user
+@sortBy1=email
+@sortBy2=username
+@sortOrder1=desc
+GET {{host}}/users
+    ?page={{page}}
+    &limit={{limit}}
+    # &search={{search}}
+    &sortBy={{sortBy1}}
+    &sortBy={{sortBy2}}
+    &sortOrder={{sortOrder1}} 
+Cookie: accessToken={{session.data.accessToken}}
+Accept: application/json
+
+###
+# Get user by ID
+# @ref session
+@userId=cmbbruim00000xr5wmjwlr1po
+GET {{host}}/users/{{userId}} HTTP/1.1
+Cookie: accessToken={{session.data.accessToken}}
+Accept: application/json
+
+###
+# Update user status
+# @ref session
+@userId=cmbbryx6g0000xr7x4wg2cb9o
+@status=ACTIVE
+PATCH {{host}}/users/{{userId}}/status HTTP/1.1
+Cookie: accessToken={{session.data.accessToken}}
+Content-Type: application/json
+
+{
+    "status": "{{status}}"
+}
+
+###
+# Get user sessions
+# @ref session
+@userId=cmbbryx6g0000xr7x4wg2cb9o
+GET {{host}}/users/{{userId}}/sessions HTTP/1.1
+Cookie: accessToken={{session.data.accessToken}}
+Accept: application/json

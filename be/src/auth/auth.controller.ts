@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
@@ -40,6 +42,7 @@ export class AuthController {
       data: {
         accessToken: 'your-access-token',
         refreshToken: 'your-refresh-token',
+        role: 'USER',
       },
     },
   })
@@ -54,9 +57,9 @@ export class AuthController {
       deviceInfo: this.extractDeviceInfo(req.headers['user-agent']),
     };
     const result = await this.authService.login(loginDto, sessionInfo);
+    const responseDataBase = { role: result.role };
     if (loginDto.responseType === 'cookie') {
       response.cookie('accessToken', result.accessToken, {
-        httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         maxAge: this.accessTokenExpiresIn,
@@ -67,13 +70,17 @@ export class AuthController {
         sameSite: 'strict',
         maxAge: this.refreshTokenExpiresIn,
       });
-      return { message: 'Login successfully' };
+      return {
+        message: 'Login successfully',
+        data: responseDataBase,
+      } satisfies IApiResponse;
     } else {
       return {
         message: 'Login successfully',
         data: {
           accessToken: result.accessToken,
           refreshToken: result.refreshToken,
+          ...responseDataBase,
         },
       } satisfies IApiResponse;
     }
@@ -180,5 +187,22 @@ export class AuthController {
   ): Promise<IApiResponse> {
     await this.authService.resetPassword(resetPasswordDto);
     return { message: 'Password reset successfully' } satisfies IApiResponse;
+  }
+
+  @Get('reset-password/verify/:resetToken')
+  @ApiOperation({
+    summary: 'Verify reset token',
+    description:
+      'This endpoint verifies the validity of a password reset token. It returns a success message if the token is valid.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Reset token is valid',
+  })
+  async verifyResetToken(
+    @Param('resetToken') resetToken: string,
+  ): Promise<IApiResponse> {
+    await this.authService.verifyResetToken(resetToken);
+    return { message: 'Reset token is valid' } satisfies IApiResponse;
   }
 }

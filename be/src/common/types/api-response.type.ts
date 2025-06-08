@@ -1,9 +1,10 @@
 // Base response interface
 export interface ApiResponse<T = unknown> {
-  message?: string;
+  statusCode?: number;
+  message: string;
   data?: T;
   meta?: PaginationMeta;
-  errors?: { field: string; message: string }[];
+  errors?: { code: string; message: string; path: string[] }[];
 }
 
 // Pagination metadata

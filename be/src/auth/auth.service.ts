@@ -15,7 +15,7 @@ import { JWTPayload } from 'src/common/types/jwt-payload.type';
 import { HasherService } from 'src/common/utils/hasher.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ResetPasswordDto } from 'src/auth/schema/reset-password.schema';
-import { UserStatus } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +34,7 @@ export class AuthService {
   ): Promise<{
     accessToken: string;
     refreshToken?: string;
+    role: Role;
   }> {
     const user = await this.prismaService.user.findFirst({
       where: {
@@ -96,6 +97,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+      role: user.role,
     };
   }
 
@@ -134,6 +136,22 @@ export class AuthService {
     if (!jti || !sub) {
       throw new UnauthorizedException('Invalid refresh token');
     }
+    const user = await this.prismaService.user.findUnique({
+      where: { id: sub },
+      select: {
+        id: true,
+        status: true,
+        username: true,
+        email: true,
+        role: true,
+      },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    this.checkUserStatus(user.status);
+
     const sessionRefreshToken =
       await this.prismaService.refreshToken.findUnique({
         where: { tokenId: jti, userId: sub, isRevoked: false },
@@ -150,7 +168,12 @@ export class AuthService {
     if (!isStoredTokenValid) {
       throw new UnauthorizedException('Invalid session');
     }
-    const accessPayload = { sub } satisfies JWTPayload;
+    const accessPayload = {
+      sub,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    } satisfies JWTPayload;
     const newAccessToken = await this.jwtService.signAsync(accessPayload);
     // Update the session with last used timestamp
     await this.prismaService.refreshToken.update({
@@ -223,5 +246,15 @@ export class AuthService {
         'User account is banned. Please create a new account.',
       );
     }
+  }
+
+  async verifyResetToken(resetToken: string): Promise<boolean> {
+    const hashedResetToken = this.hasher.hashDeterministic(resetToken);
+    const cacheKey = this.resetTokenPrefix + hashedResetToken;
+    const tokenDataString = await this.cacheManager.get<string>(cacheKey);
+    if (!tokenDataString) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+    return true;
   }
 }

@@ -1,5 +1,5 @@
-@email=example@example.com
-@password=Password!123
+@email=admin@example.com
+@password=Password123!
 
 ###
 # @name session
@@ -47,3 +47,8 @@ Content-Type: application/json
   "newPassword": "{{newPassword}}",
   "resetToken": "{{resetToken}}"
 }
+
+###
+# @name verifyResetToken
+@resetToken=cd906ba5-5061-4844-a14f-03efbba9c93b
+GET {{host}}/auth/reset-password/verify/{{resetToken}} HTTP/1.1

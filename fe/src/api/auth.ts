@@ -37,4 +37,10 @@ export const authApi = {
     );
     return response.data;
   },
+  refreshToken: async () => {
+    const response = await apiClient.post<ApiResponse<null>>(
+      "/auth/refresh-token"
+    );
+    return response.data;
+  },
 };

@@ -16,6 +16,7 @@ import { HasherService } from 'src/common/utils/hasher.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ResetPasswordDto } from 'src/auth/schema/reset-password.schema';
 import { Role, UserStatus } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly hasher: HasherService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly configService: ConfigService,
   ) {}
   async login(
     dto: LoginDto,
@@ -79,7 +81,7 @@ export class AuthService {
       jti: tokenId,
     } satisfies JWTPayload;
     const refreshToken = await this.jwtService.signAsync(refreshPayload, {
-      expiresIn: '7d',
+      expiresIn: this.configService.get<string>('jwt.refreshExpiresIn'),
     });
     // Save the hashed token in the session table
     const hashedRefreshToken = await this.hasher.hash(refreshToken);
@@ -91,7 +93,7 @@ export class AuthService {
         deviceInfo: sessionInfo.deviceInfo,
         ipAddress: sessionInfo.ipAddress,
         userAgent: sessionInfo.userAgent,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7d
       },
     });
     return {

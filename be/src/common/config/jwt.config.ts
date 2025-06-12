@@ -6,6 +6,7 @@ export interface JwtConfig {
   issuer: string;
   audience: string;
   refreshSecret: string;
+  refreshExpiresIn: string;
 }
 
 export default registerAs(
@@ -16,5 +17,6 @@ export default registerAs(
     issuer: process.env.JWT_ISSUER!,
     audience: process.env.JWT_AUDIENCE!,
     refreshSecret: process.env.REFRESH_SECRET!,
+    refreshExpiresIn: process.env.REFRESH_EXPIRES_IN || '7d',
   }),
 );

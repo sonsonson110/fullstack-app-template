@@ -38,7 +38,7 @@ Content-Type: application/json
 GET {{host}}/users
     ?page={{page}}
     &limit={{limit}}
-    # &search={{search}}
+    &search={{search}}
     &sortBy={{sortBy1}}
     &sortBy={{sortBy2}}
     &sortOrder={{sortOrder1}} 

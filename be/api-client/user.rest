@@ -73,3 +73,11 @@ Content-Type: application/json
 GET {{host}}/users/{{userId}}/sessions HTTP/1.1
 Cookie: accessToken={{session.data.accessToken}}
 Accept: application/json
+
+###
+# Get user profile
+# @ref session
+@userId=cmbbryx6g0000xr7x4wg2cb9o
+GET {{host}}/users/me HTTP/1.1
+Cookie: accessToken={{session.data.accessToken}}
+Accept: application/json

@@ -1,5 +1,6 @@
 import { AdminLayout } from "@/app-admin/AdminLayout";
 import { DashboardPage } from "@/app-admin/dashboard";
+import UserDetailPage from "@/app-admin/users/user-detail";
 import { UsersPage } from "@/app-admin/users/user-list";
 import ForgotPasswordPage from "@/components/custom/forgot-password-page";
 import LoginPage from "@/components/custom/login-page";
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", Component: DashboardPage },
           { path: "users", Component: UsersPage },
+          { path: "users/:userId", Component: UserDetailPage },
           { path: "songs", element: <div>Songs</div> },
           { path: "albums", element: <div>Albums</div> },
         ],

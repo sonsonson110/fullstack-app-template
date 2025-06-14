@@ -1,4 +1,4 @@
-import { useBreadcrumbEffect } from "@/context/breadcrumb-context";
+import { useBreadcrumbEffect } from "@/context/breadcrumb";
 
 export const DashboardPage = () => {
   useBreadcrumbEffect([

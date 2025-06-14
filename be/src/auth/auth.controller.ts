@@ -29,6 +29,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  //#region api documentation
   @ApiOperation({
     summary: 'User login',
     description:
@@ -46,6 +47,7 @@ export class AuthController {
       },
     },
   })
+  //#endregion
   async login(
     @Body() loginDto: LoginDto,
     @Req() req: Request,
@@ -96,6 +98,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
+  //#region api documentation
   @ApiOperation({
     summary: 'User logout',
     description:
@@ -105,6 +108,7 @@ export class AuthController {
     status: 200,
     description: 'Logout successful',
   })
+  //#endregion
   async logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
@@ -121,6 +125,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  //#region api documentation
   @ApiOperation({
     summary: 'Refresh access token',
     description:
@@ -130,6 +135,7 @@ export class AuthController {
     status: 201,
     description: 'Access token refreshed successfully',
   })
+  //#endregion
   async refreshToken(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
@@ -153,6 +159,7 @@ export class AuthController {
 
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
+  //#region api documentation
   @ApiOperation({
     summary: 'Forgot password',
     description:
@@ -162,6 +169,7 @@ export class AuthController {
     status: 200,
     description: "Password reset link sent to the user's email",
   })
+  //#endregion
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto,
   ): Promise<IApiResponse> {
@@ -173,6 +181,7 @@ export class AuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
+  //#region api documentation
   @ApiOperation({
     summary: 'Reset password',
     description:
@@ -182,6 +191,7 @@ export class AuthController {
     status: 200,
     description: 'Password reset successfully',
   })
+  //#endregion
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<IApiResponse> {
@@ -190,6 +200,7 @@ export class AuthController {
   }
 
   @Get('reset-password/verify/:resetToken')
+  //#region api documentation
   @ApiOperation({
     summary: 'Verify reset token',
     description:
@@ -199,6 +210,7 @@ export class AuthController {
     status: 200,
     description: 'Reset token is valid',
   })
+  //#endregion
   async verifyResetToken(
     @Param('resetToken') resetToken: string,
   ): Promise<IApiResponse> {

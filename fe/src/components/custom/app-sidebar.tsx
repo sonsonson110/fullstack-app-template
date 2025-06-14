@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { SearchForm } from "@/components/search-form";
+import { SearchForm } from "@/components/custom/search-form";
 import {
   Sidebar,
   SidebarContent,
@@ -15,7 +15,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "react-router";
-import { NavUser } from "@/components/ui/nav-user";
+import { NavUser } from "@/components/custom/nav-user";
 
 const data = {
   versions: ["1.0.0"],

@@ -17,8 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useMutation } from "@tanstack/react-query";
-import { authApi } from "@/api/auth";
+import { useAuth } from "@/context/auth";
 import { useNavigate } from "react-router";
 
 export function NavUser({
@@ -32,18 +31,13 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const mutation = useMutation({
-    mutationFn: authApi.logout,
-    onSuccess: () => {
-      navigate("/login");
-    },
-  });
-
-  const handleLogout = () => {
-    mutation.mutate();
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
   };
-  
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>

@@ -4,8 +4,13 @@ import type { ForgotPasswordDto } from "@/schemas/forgot-password.schema";
 import type { LoginDto } from "@/schemas/login.schema";
 import type { ResetPasswordDto } from "@/schemas/reset-password.schema";
 import type { Role } from "@/types/enums";
+import type { UserProfile } from "@/types/user-profile";
 
 export const authApi = {
+  getCurrentUser: async (): Promise<ApiResponse<UserProfile>> => {
+    const response = await apiClient.get<ApiResponse<UserProfile>>("/users/me");
+    return response.data;
+  },
   login: async (dto: LoginDto): Promise<ApiResponse<{ role: Role }>> => {
     const response = await apiClient.post<ApiResponse<{ role: Role }>>(
       "/auth/login",

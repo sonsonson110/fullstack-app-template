@@ -11,7 +11,9 @@ import type { UserListItem } from "@/types/user";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
-export const columns: ColumnDef<UserListItem>[] = [
+export const columns = (
+  onNavigateToDetail: (userId: string) => void
+): ColumnDef<UserListItem>[] => [
   {
     accessorKey: "username",
     header: "Username",
@@ -83,7 +85,9 @@ export const columns: ColumnDef<UserListItem>[] = [
               Copy user ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View detail</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onNavigateToDetail(user.id)}>
+              View detail
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

@@ -9,10 +9,11 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useBreadcrumbEffect } from "@/context/breadcrumb-context";
+import { useBreadcrumbEffect } from "@/context/breadcrumb";
 import type { QueryParams } from "@/types/pagination-query-params";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import React from "react";
+import { useNavigate } from "react-router";
 
 export function UsersPage() {
   const [paginationMeta, setPaginationMeta] = React.useState<PaginationMeta>({
@@ -26,12 +27,10 @@ export function UsersPage() {
   const [search, setSearch] = React.useState("");
   const [sort, setSort] = React.useState<SortItem[]>([]);
 
+  const navigate = useNavigate();
+
   const { isPending, isError, error, data, isFetching, refetch } = useQuery({
-    queryKey: [
-      "users",
-      paginationMeta.page,
-      paginationMeta.limit,
-    ],
+    queryKey: ["users", paginationMeta.page, paginationMeta.limit],
     queryFn: () => {
       const sortBy: string[] = [],
         sortOrder: string[] = [];
@@ -48,7 +47,6 @@ export function UsersPage() {
       } as QueryParams);
     },
     placeholderData: keepPreviousData,
-    
   });
 
   React.useEffect(() => {
@@ -123,7 +121,9 @@ export function UsersPage() {
             </div>
           </div>
           <DataTable
-            columns={columns}
+            columns={columns((userId) => {
+              navigate(userId);
+            })}
             data={Array.isArray(data?.data) ? data.data : []}
           />
         </div>

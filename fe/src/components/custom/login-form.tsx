@@ -27,16 +27,19 @@ import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import { Link, useNavigate } from "react-router";
 import z from "zod";
+import { useAuth } from "@/context/auth";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
+  const { refetchUser } = useAuth();
   const mutation = useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
       if (data.data!.role === "ADMIN") {
+        refetchUser();
         navigate("/admin");
       } else {
         navigate("/");

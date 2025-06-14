@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, UserStatus } from '@prisma/client';
+import { Prisma, Role, UserStatus } from '@prisma/client';
 import { PrismaService } from 'src/common/libs/prisma/prisma.service';
 import {
   calculatePagination,
@@ -19,6 +19,29 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly hasherService: HasherService,
   ) {}
+
+  async getCurrentProfile(userId: string): Promise<{
+    id: string;
+    username: string;
+    email: string;
+    role: Role;
+  }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
 
   async createUser(
     dto: CreateUserDto,

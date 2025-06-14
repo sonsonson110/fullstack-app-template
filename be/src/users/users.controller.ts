@@ -6,25 +6,60 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ApiResponse as IApiResponse } from 'src/common/types/api-response.type';
+import { RequestWithUser } from 'src/common/types/request-with-user.type';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 import { CreateUserDto } from 'src/users/schema/create-user.schema';
 import { GetUsersQueryDto } from 'src/users/schema/get-users.schema';
 import { UpdateUserStatusBodyDto } from 'src/users/schema/update-user-status.schema';
 import { UsersService } from './users.service';
-import { RolesGuard } from 'src/guards/roles.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('me')
+  @UseGuards(AuthGuard)
+  //#region api documentation
+  @ApiOperation({
+    summary: 'Get current user profile',
+    description:
+      'This endpoint retrieves the profile of the currently authenticated user.',
+  })
+  @ApiResponse({
+    status: 200,
+    example: {
+      message: 'Successfully retrieved current user profile',
+      data: {
+        message: 'Successfully retrieved current user profile',
+        data: {
+          id: 'cmbbryx6g0000xr7x4wg2cb9o',
+          username: 'exampleuser',
+          email: 'example@example.com',
+          role: 'USER',
+        },
+      },
+    },
+  })
+  //#endregion
+  async getCurrentProfile(@Req() req: RequestWithUser): Promise<IApiResponse> {
+    const user = await this.usersService.getCurrentProfile(req.user.sub);
+    return {
+      message: 'Successfully retrieved current user profile',
+      data: user,
+    } satisfies IApiResponse;
+  }
+
   @Post()
   @UseGuards(AuthGuard)
+  //#region api documentation
   @ApiOperation({
     summary: 'Create a new user',
     description:
@@ -41,6 +76,7 @@ export class UsersController {
       },
     },
   })
+  //#endregion
   async create(@Body() createUserDto: CreateUserDto): Promise<IApiResponse> {
     const result = await this.usersService.createUser(createUserDto);
     return {
@@ -51,6 +87,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard)
+  //#region api documentation
   @ApiOperation({
     summary: 'Get all users',
     description:
@@ -119,6 +156,7 @@ export class UsersController {
       ],
     },
   })
+  //#endregion
   async getUsers(
     @Query() getUsersDto: GetUsersQueryDto,
   ): Promise<IApiResponse> {
@@ -131,6 +169,7 @@ export class UsersController {
 
   @Get(':userId')
   @UseGuards(AuthGuard)
+  //#region api documentation
   @ApiOperation({
     summary: 'Get user by ID',
     description: 'This endpoint retrieves a user by their unique identifier.',
@@ -155,6 +194,7 @@ export class UsersController {
       },
     },
   })
+  //#endregion
   async getUserById(@Param('userId') userId: string): Promise<IApiResponse> {
     const result = await this.usersService.findUserById(userId);
     return {
@@ -166,6 +206,7 @@ export class UsersController {
   @Patch(':userId/status')
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard, RolesGuard)
+  //#region api documentation
   @ApiOperation({
     summary: 'Update user status',
     description:
@@ -183,6 +224,7 @@ export class UsersController {
       message: 'User status updated successfully',
     },
   })
+  //#endregion
   async updateUserStatus(
     @Param('userId') userId: string,
     @Body() updateUserStatusBodyDto: UpdateUserStatusBodyDto,
@@ -198,6 +240,7 @@ export class UsersController {
 
   @Get(':userId/sessions')
   @UseGuards(AuthGuard)
+  //#region api documentation
   @ApiOperation({
     summary: 'Get user sessions',
     description:
@@ -226,6 +269,7 @@ export class UsersController {
       ],
     },
   })
+  //#endregion
   async getUserSessions(
     @Param('userId') userId: string,
   ): Promise<IApiResponse> {

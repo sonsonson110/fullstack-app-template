@@ -17,9 +17,10 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
 
-  const { data, error, status } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: ["auth", "user"],
     queryFn: authApi.getCurrentUser,
+    retry: false,
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user: data?.data ?? null,
-        isLoading: status === "success" || status === "error",
+        isLoading: isLoading,
         error,
         logout,
         refetchUser,

@@ -20,11 +20,13 @@ import { CreateUserDto } from 'src/users/schema/create-user.schema';
 import { GetUsersQueryDto } from 'src/users/schema/get-users.schema';
 import { UpdateUserStatusBodyDto } from 'src/users/schema/update-user-status.schema';
 import { UsersService } from './users.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @SkipThrottle()
   @Get('me')
   @UseGuards(AuthGuard)
   //#region api documentation

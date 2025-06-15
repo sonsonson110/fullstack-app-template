@@ -5,6 +5,7 @@ import type { LoginDto } from "@/schemas/login.schema";
 import type { ResetPasswordDto } from "@/schemas/reset-password.schema";
 import type { Role } from "@/types/enums";
 import type { UserProfile } from "@/types/user-profile";
+import axios from "axios";
 
 export const authApi = {
   getCurrentUser: async (): Promise<ApiResponse<UserProfile>> => {
@@ -43,8 +44,9 @@ export const authApi = {
     return response.data;
   },
   refreshToken: async () => {
-    const response = await apiClient.post<ApiResponse<null>>(
-      "/auth/refresh-token"
+    // Do not use apiClient here to avoid circular dependency issues
+    const response = await axios.post<ApiResponse<null>>(
+      `${process.env.VITE_API_URL}/auth/refresh-token`
     );
     return response.data;
   },

@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Logout error:", error);
     } finally {
       queryClient.clear();
+      window.location.href = "/login";
     }
   };
 

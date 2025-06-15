@@ -185,7 +185,6 @@ export class AuthService {
     return newAccessToken;
   }
 
-  // TODO: Invalidate last generated reset token if same user creates a new one
   async forgotPasswordAction(email: string): Promise<void> {
     const user = await this.prismaService.user.findUnique({
       where: { email },

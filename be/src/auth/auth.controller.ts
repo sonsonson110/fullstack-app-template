@@ -21,6 +21,7 @@ import { ApiResponse as IApiResponse } from 'src/common/types/api-response.type'
 import { JWTPayload } from 'src/common/types/jwt-payload.type';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,7 @@ export class AuthController {
   private readonly refreshTokenExpiresIn: number = 7 * 24 * 60 * 60 * 1000;
   constructor(private readonly authService: AuthService) {}
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('login')
   //#region api documentation
   @ApiOperation({
@@ -157,6 +159,7 @@ export class AuthController {
     } satisfies IApiResponse;
   }
 
+  @Throttle({ default: { limit: 1, ttl: 8.64e7 } }) // 1 request per day
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   //#region api documentation

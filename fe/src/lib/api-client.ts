@@ -49,7 +49,6 @@ apiClient.interceptors.response.use(
         } catch (refreshError) {
           processQueue(false); // Failure - reject requests
           isRefreshing = false;
-          window.location.href = "/login";
           return Promise.reject(refreshError);
         }
       } else {

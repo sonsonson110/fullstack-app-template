@@ -7,7 +7,6 @@ import { createContext, useContext } from "react";
 interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
-  isError: boolean;
   error: Error | null;
   logout: () => Promise<void>;
   refetchUser: () => Promise<void>;
@@ -18,10 +17,9 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, error, status } = useQuery({
     queryKey: ["auth", "user"],
     queryFn: authApi.getCurrentUser,
-    retry: false, // Do not retry auth failures
     staleTime: 10 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -44,8 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     <AuthContext.Provider
       value={{
         user: data?.data ?? null,
-        isLoading,
-        isError,
+        isLoading: status === "success" || status === "error",
         error,
         logout,
         refetchUser,
@@ -59,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };

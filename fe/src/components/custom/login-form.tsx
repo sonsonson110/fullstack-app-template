@@ -37,9 +37,9 @@ export function LoginForm({
   const { refetchUser } = useAuth();
   const mutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      await refetchUser();
       if (data.data!.role === "ADMIN") {
-        refetchUser();
         navigate("/admin");
       } else {
         navigate("/");

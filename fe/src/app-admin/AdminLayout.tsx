@@ -13,26 +13,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/context/auth";
 import { useBreadcrumb } from "@/context/breadcrumb";
 import React from "react";
-import { Navigate, Outlet } from "react-router";
+import { Outlet } from "react-router";
 
 export function AdminLayout() {
-  const { user, isLoading, isError } = useAuth();
   const { breadcrumbs } = useBreadcrumb();
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError || !user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (user.role !== 'ADMIN') {
-    return <Navigate to="/not-found" replace />;
-  }
 
   return (
     <SidebarProvider>

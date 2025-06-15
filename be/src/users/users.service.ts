@@ -1,5 +1,8 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,9 +18,12 @@ import { GetUsersQueryDto } from 'src/users/schema/get-users.schema';
 
 @Injectable()
 export class UsersService {
+  private readonly userProfilePrefix = 'user_profile:';
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly hasherService: HasherService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async getCurrentProfile(userId: string): Promise<{
@@ -26,6 +32,18 @@ export class UsersService {
     email: string;
     role: Role;
   }> {
+    // Retrieve user profile from cache
+    const cacheKey = `${this.userProfilePrefix}${userId}`;
+    const cachedProfile = await this.cacheManager.get<string>(cacheKey);
+    if (cachedProfile) {
+      return JSON.parse(cachedProfile) as {
+        id: string;
+        username: string;
+        email: string;
+        role: Role;
+      };
+    }
+    // If not in cache, fetch from database and set cache
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -39,6 +57,8 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    const expiresIn = 10 * 60 * 1000; // Cache for 10 minutes
+    await this.cacheManager.set(cacheKey, JSON.stringify(user), expiresIn);
 
     return user;
   }

@@ -6,34 +6,53 @@ import ForgotPasswordPage from "@/components/custom/forgot-password-page";
 import LoginPage from "@/components/custom/login-page";
 import NotFoundPage from "@/components/custom/not-found-page";
 import ResetPasswordPage from "@/components/custom/reset-password-page";
+import { ProtectedRoute } from "@/components/route/protected.route";
+import { PublicRoute } from "@/components/route/public.route";
+import { RoleBasedRoute } from "@/components/route/role-based.route";
 import { createBrowserRouter, Navigate } from "react-router";
 
 export const router = createBrowserRouter([
+  // Public routes that redirect authenticated users
   {
-    path: "/admin",
+    element: <PublicRoute />,
     children: [
+      { path: "/login", Component: LoginPage },
+      { path: "/forgot-password", Component: ForgotPasswordPage },
+      { path: "/reset-password/:resetToken", Component: ResetPasswordPage },
+    ],
+  },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      // Admin routes - require ADMIN role
       {
-        index: true,
-        element: <Navigate to="dashboard" replace />,
-      },
-      {
-        path: "",
-        Component: AdminLayout,
+        path: "/admin",
+        element: <RoleBasedRoute allowedRoles={["ADMIN"]} />,
         children: [
-          { path: "dashboard", Component: DashboardPage },
-          { path: "users", Component: UsersPage },
-          { path: "users/:userId", Component: UserDetailPage },
-          { path: "songs", element: <div>Songs</div> },
-          { path: "albums", element: <div>Albums</div> },
+          {
+            index: true,
+            element: <Navigate to="dashboard" replace />,
+          },
+          {
+            path: "",
+            Component: AdminLayout,
+            children: [
+              { path: "dashboard", Component: DashboardPage },
+              { path: "users", Component: UsersPage },
+              { path: "users/:userId", Component: UserDetailPage },
+              { path: "songs", element: <div>Songs</div> },
+              { path: "albums", element: <div>Albums</div> },
+            ],
+          },
         ],
+      },
+
+      // Regular user routes could go here
+      {
+        path: "/",
+        element: <div>User Home</div>,
       },
     ],
   },
-  { path: "/login", Component: LoginPage },
-  {
-    path: "/reset-password/:resetToken",
-    Component: ResetPasswordPage,
-  },
-  { path: "/forgot-password", Component: ForgotPasswordPage },
   { path: "*", Component: NotFoundPage },
 ]);
